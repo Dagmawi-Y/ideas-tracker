@@ -45,3 +45,4 @@ const createUser = () => {
 		init
 	};
 };
+export const user = createUser();
