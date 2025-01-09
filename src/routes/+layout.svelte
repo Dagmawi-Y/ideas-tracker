@@ -3,11 +3,17 @@
 	import { user } from '$lib/user';
 	import { fade, fly } from 'svelte/transition';
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 
 	let mounted = false;
 	onMount(() => {
 		mounted = true;
 	});
+
+	const handleLogout = async () => {
+		await user.logout();
+		goto('/login');
+	};
 </script>
 
 <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
@@ -20,9 +26,12 @@
 				<div class="flex items-center gap-4">
 					{#if $user}
 						<span class="text-sm text-gray-600 dark:text-gray-300">Hi, {$user.name}</span>
-						<a href="/logout" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors">
+						<button 
+							on:click={handleLogout}
+							class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors"
+						>
 							Logout
-						</a>
+						</button>
 					{:else}
 						<a href="/login" class="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full hover:opacity-90 transition-opacity">
 							Login
