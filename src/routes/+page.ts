@@ -1,15 +1,10 @@
 import { getIdeas } from '$lib/ideas';
-import { account } from '$lib/appwrite';
+import { user } from '$lib/user';
+import { get } from 'svelte/store';
 
 export async function load() {
-	try {
-		await account.get();
-		return {
-			ideas: await getIdeas()
-		};
-	} catch (error) {
-		return {
-			ideas: { total: 0, documents: [] }
-		};
-	}
+	const currentUser = get(user);
+	return {
+		ideas: await getIdeas(currentUser?.$id)
+	};
 }
