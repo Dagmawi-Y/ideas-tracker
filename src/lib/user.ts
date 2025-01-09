@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import { ID, Account } from 'appwrite';
+import { ID } from 'appwrite';
 import { goto } from '$app/navigation';
 import { account } from './appwrite';
 
@@ -37,13 +37,7 @@ const createUser = () => {
 		if (!isBrowser) return;
 		await account.createEmailPasswordSession(email, password);
 		await init();
-	}
-
-	async function loginWithGoogle() {
-		if (!isBrowser) return;
-		const redirectUrl = window.location.origin;
-		// @ts-ignore - Appwrite types are not up to date
-		await account.createOAuth2Session('google', redirectUrl);
+		goto('/');
 	}
 
 	async function logout() {
@@ -57,7 +51,6 @@ const createUser = () => {
 		subscribe: store.subscribe,
 		register,
 		login,
-		loginWithGoogle,
 		logout,
 		init
 	};

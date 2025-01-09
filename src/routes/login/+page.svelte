@@ -13,14 +13,39 @@
 		}
 	});
 
-	const login = async () => {
+	const login = async (e: SubmitEvent) => {
+		e.preventDefault();
 		loading = true;
 		error = '';
+		
 		try {
-			await user.loginWithGoogle();
+			const formData = new FormData(e.target as HTMLFormElement);
+			await user.login(
+				formData.get('email') as string,
+				formData.get('password') as string
+			);
 			goto('/');
 		} catch (e) {
-			error = 'Failed to login. Please try again.';
+			error = 'Invalid email or password';
+		}
+		loading = false;
+	};
+
+	const register = async (e: SubmitEvent) => {
+		e.preventDefault();
+		loading = true;
+		error = '';
+		
+		try {
+			const formData = new FormData(e.target as HTMLFormElement);
+			await user.register(
+				formData.get('email') as string,
+				formData.get('password') as string,
+				formData.get('name') as string
+			);
+			goto('/');
+		} catch (e) {
+			error = 'Registration failed. Please try again.';
 		}
 		loading = false;
 	};
@@ -32,17 +57,8 @@
 >
 	<div 
 		in:fly={{ y: 20, duration: 300, delay: 150 }}
-		class="w-full max-w-md p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg space-y-8"
+		class="w-full max-w-md space-y-8"
 	>
-		<div class="text-center">
-			<h1 class="text-3xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-				Welcome Back
-			</h1>
-			<p class="mt-2 text-gray-600 dark:text-gray-300">
-				Sign in to share your innovative ideas
-			</p>
-		</div>
-
 		{#if error}
 			<div 
 				in:fly={{ y: -10, duration: 300 }}
@@ -52,26 +68,113 @@
 			</div>
 		{/if}
 
-		<button
-			on:click={login}
-			disabled={loading}
-			class="w-full flex items-center justify-center gap-3 px-6 py-3 text-white font-medium bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg hover:opacity-90 transform hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-		>
-			{#if loading}
-				<svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-					<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-					<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-				</svg>
-			{:else}
-				<svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-					<path d="M20.283 10.356h-8.327v3.451h4.792c-.446 2.193-2.313 3.453-4.792 3.453a5.27 5.27 0 0 1-5.279-5.28 5.27 5.27 0 0 1 5.279-5.279c1.259 0 2.397.447 3.29 1.178l2.6-2.599c-1.584-1.381-3.615-2.233-5.89-2.233a8.908 8.908 0 0 0-8.934 8.934 8.907 8.907 0 0 0 8.934 8.934c4.467 0 8.529-3.249 8.529-8.934 0-.528-.081-1.097-.202-1.625z"></path>
-				</svg>
-			{/if}
-			Sign in with Google
-		</button>
+		<div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 space-y-8">
+			<div class="text-center">
+				<h1 class="text-3xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+					Login
+				</h1>
+				<p class="mt-2 text-gray-600 dark:text-gray-300">
+					Sign in to share your innovative ideas
+				</p>
+			</div>
 
-		<p class="text-sm text-center text-gray-500 dark:text-gray-400">
-			By signing in, you agree to our terms and conditions.
-		</p>
+			<form on:submit={login} class="space-y-4">
+				<div class="space-y-2">
+					<label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+						Email
+						<input 
+							type="email" 
+							name="email" 
+							required
+							placeholder="your@email.com"
+							class="mt-1 block w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-shadow"
+						/>
+					</label>
+				</div>
+				<div class="space-y-2">
+					<label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+						Password
+						<input 
+							type="password" 
+							name="password" 
+							required
+							placeholder="••••••••"
+							class="mt-1 block w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-shadow"
+						/>
+					</label>
+				</div>
+				<button 
+					type="submit"
+					disabled={loading}
+					class="w-full px-6 py-3 text-white font-medium bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg hover:opacity-90 transform hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+				>
+					{#if loading}
+						<span class="inline-block animate-spin mr-2">⟳</span>
+					{/if}
+					Sign In
+				</button>
+			</form>
+		</div>
+
+		<div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 space-y-8 mt-6">
+			<div class="text-center">
+				<h2 class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+					New Here?
+				</h2>
+				<p class="mt-2 text-gray-600 dark:text-gray-300">
+					Create an account to get started
+				</p>
+			</div>
+
+			<form on:submit={register} class="space-y-4">
+				<div class="space-y-2">
+					<label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+						Name
+						<input 
+							type="text" 
+							name="name" 
+							required
+							placeholder="Your name"
+							class="mt-1 block w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-shadow"
+						/>
+					</label>
+				</div>
+				<div class="space-y-2">
+					<label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+						Email
+						<input 
+							type="email" 
+							name="email" 
+							required
+							placeholder="your@email.com"
+							class="mt-1 block w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-shadow"
+						/>
+					</label>
+				</div>
+				<div class="space-y-2">
+					<label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+						Password
+						<input 
+							type="password" 
+							name="password" 
+							required
+							minlength="8"
+							placeholder="••••••••"
+							class="mt-1 block w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-shadow"
+						/>
+					</label>
+				</div>
+				<button 
+					type="submit"
+					disabled={loading}
+					class="w-full px-6 py-3 text-white font-medium bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg hover:opacity-90 transform hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+				>
+					{#if loading}
+						<span class="inline-block animate-spin mr-2">⟳</span>
+					{/if}
+					Create Account
+				</button>
+			</form>
+		</div>
 	</div>
 </div>
